@@ -8,6 +8,7 @@ import os
 import util
 from twilio.rest import Client
 from drowsiness import DrowsinessDetectorApp
+import sys
 
 
 class App:
@@ -98,13 +99,16 @@ class App:
                 
                 #drowsiness detection
                 #self.main_window.withdraw()
-                self.open_drowsiness_window()
+                #self.open_drowsiness_window()
+                self.redirect_to_specific_file()
+                
+                
         except subprocess.CalledProcessError as e:
             util.msg_box('Error', 'Error during face recognition. Please try again.')
 
         os.remove(unknown_img_path)
 
-
+    
     def admin(self):
         self.admin_access_main_window = tk.Toplevel(self.main_window)
         self.admin_access_main_window.geometry("900x300")
@@ -159,10 +163,7 @@ class App:
                                                        self.capture)
         self.accept_new_user_button.place(x=580, y=150)
 
-        #TRY AGAIN BUTTON
-        # self.try_again_new_user_button = util.get_button2(self.new_tab_main_window, 'Try again', 'maroon',
-        #                                                   self.try_again_user)
-        # self.try_again_new_user_button.place(x=580, y=200)
+
         
         self.entry_name = Entry(self.new_tab_main_window)
         self.entry_name.place(x=580, y=100)
@@ -189,8 +190,15 @@ class App:
 
 
     def redirect_to_specific_file(self):
-        exec(open('drowsiness.py').read())
-        sys.exit()
+        file_path = 'drowsiness.py'  # Provide the path to the file you want to redirect to
+        try:
+            # Run the specified file
+            subprocess.Popen(['python', file_path])
+        except Exception as e:
+            print("Error:", e)
+        finally:
+            # Close the current Python process
+            sys.exit()
 
     # def try_again_user(self):
     #     self.accept_new_user_button.config(state=tk.NORMAL)
@@ -245,3 +253,5 @@ class App:
 if __name__ == '__main__':
     app = App()
     app.start()
+    file_path = 'drowsiness,py'
+    app.redirect_to_specific_file(file_path)
