@@ -9,6 +9,7 @@ import util
 from twilio.rest import Client
 from drowsiness import DrowsinessDetectorApp
 import sys
+from sms_sender import send_sms
 
 
 class App:
@@ -71,6 +72,7 @@ class App:
     def login(self):
         if self.login_attempts >= self.max_login_attempts:
             util.msg_box('Access Blocked', 'Too many login attempts. Please try again later.')
+            send_sms()
             return
 
         unknown_img_path = './.tmp.jpg'
@@ -89,7 +91,7 @@ class App:
                 self.login_attempts += 1
                 util.msg_box('Login Failed',
                              'Unknown person. Please try again. Attempt {} of {}.'.format(self.login_attempts, self.max_login_attempts))
-                #self.sms()
+                
                 #beeper sound
             else:
                 self.login_attempts = 0  # Reset the login attempts on a successful login
