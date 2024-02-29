@@ -10,6 +10,7 @@ from twilio.rest import Client
 from drowsiness import DrowsinessDetectorApp
 import sys
 from sms_sender import send_sms
+import pygame
 
 
 class App:
@@ -72,7 +73,8 @@ class App:
     def login(self):
         if self.login_attempts >= self.max_login_attempts:
             util.msg_box('Access Blocked', 'Too many login attempts. Please try again later.')
-            send_sms()
+            #send_sms()
+            self.play_alarm()
             return
 
         unknown_img_path = './.tmp.jpg'
@@ -110,6 +112,12 @@ class App:
 
         os.remove(unknown_img_path)
 
+    def play_alarm(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load('car_alarm.mp3')
+        pygame.mixer.music.play()
+        pygame.time.wait(20000) 
+        pygame.mixer.music.stop()
     
     def admin(self):
         self.admin_access_main_window = tk.Toplevel(self.main_window)
