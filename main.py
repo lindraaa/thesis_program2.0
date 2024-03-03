@@ -72,7 +72,7 @@ class App:
 
     def login(self):
         if self.login_attempts >= self.max_login_attempts:
-            util.msg_box('Access Blocked', 'Too many login attempts. Please try again later.')
+            util.msg_box('Access Blocked', 'Too many login attempts!')
             #send_sms()
             self.play_alarm()
             return
