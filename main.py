@@ -12,6 +12,13 @@ import sys
 from sms_sender import send_sms
 import pygame
 
+import RPi.GPIO as GPIO
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11,GPIO.IN,pull_up_down=GPIO.PUD_OFF)
+GPIO.setup(15,GPIO.IN,pull_up_down=GPIO.PUD_OFF)
+
 
 class App:
     def __init__(self):
@@ -94,16 +101,12 @@ class App:
                 util.msg_box('Login Failed',
                              'Unknown person. Please try again. Attempt {} of {}.'.format(self.login_attempts, self.max_login_attempts))
                 
-                #beeper sound
+               
             else:
                 self.login_attempts = 0  # Reset the login attempts on a successful login
                 name = output.split(',')[1][:-5]
                 util.msg_box('Starting Engine', 'Welcome, {}'.format(name))
-                #car ignition relay 
                 
-                #drowsiness detection
-                #self.main_window.withdraw()
-                #self.open_drowsiness_window()
                 self.redirect_to_specific_file()
                 
                 
@@ -200,7 +203,7 @@ class App:
 
 
     def redirect_to_specific_file(self):
-        file_path = 'drowsiness.py'  # Provide the path to the file you want to redirect to
+        file_path = 'starter.py'  # Provide the path to the file you want to redirect to
         try:
             # Run the specified file
             subprocess.Popen(['python', file_path])
@@ -210,9 +213,6 @@ class App:
             # Close the current Python process
             sys.exit()
 
-    # def try_again_user(self):
-    #     self.accept_new_user_button.config(state=tk.NORMAL)
-    #     self.try_again_new_user_button.config(state=tk.DISABLED)
 
     def add_new_webcam_for_registration(self, label):
         if 'cap' not in self.__dict__:
@@ -263,5 +263,5 @@ class App:
 if __name__ == '__main__':
     app = App()
     app.start()
-    file_path = 'drowsiness,py'
+    file_path = 'starter.py'
     app.redirect_to_specific_file(file_path)
