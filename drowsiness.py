@@ -10,6 +10,8 @@ import time
 import cv2
 import dlib
 import pygame
+import subprocess
+
 
 class DrowsinessDetectorApp:
     def __init__(self, master):
@@ -24,8 +26,9 @@ class DrowsinessDetectorApp:
         self.alarm_status = False
         self.alarm_status2 = False
         self.saying = False
-        self.EYE_AR_THRESH = 0.3
-        self.EYE_AR_CONSEC_FRAMES = 60
+        
+        self.EYE_AR_THRESH = 0.4
+        self.EYE_AR_CONSEC_FRAMES = 30
         self.YAWN_THRESH = 20
 
         self.detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
@@ -40,9 +43,14 @@ class DrowsinessDetectorApp:
         self.update_frame()
 
 
-        self.quit_button = tk.Button(self.master, text="Quit", command=self.quit)
-        self.quit_button.pack()
+       # self.quit_button = tk.Button(self.master, text="Quit", command=self.quit)
+       # self.quit_button.pack()
+        
+        self.shutdown_button = tk.Button(self.master, text="Shutdown", command=self.shutdown_pi)
+        self.shutdown_button.pack()
 
+    def shutdown_pi(self):
+        subprocess.call("sudo shutdown -h now", shell=True)
     
     def update_frame(self):
         if not self.paused:
