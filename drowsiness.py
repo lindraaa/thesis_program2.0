@@ -28,10 +28,11 @@ class DrowsinessDetectorApp:
         self.saying = False
         
         self.EYE_AR_THRESH = 0.4
-        self.EYE_AR_CONSEC_FRAMES = 30
+        self.EYE_AR_CONSEC_FRAMES = 20
         self.YAWN_THRESH = 20
 
-        self.detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        #self.detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
         self.frame = tk.Label(self.master)
@@ -57,18 +58,14 @@ class DrowsinessDetectorApp:
             frame = self.vs.read()
             frame = imutils.resize(frame, width=450)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            rects = self.detector.detectMultiScale(gray, scaleFactor=1.1,
-                                                   minNeighbors=5, minSize=(30, 30),
-                                                   flags=cv2.CASCADE_SCALE_IMAGE)
-
-            for (x, y, w, h) in rects:
-                rect = dlib.rectangle(int(x), int(y), int(x + w), int(y + h))
-
+            rects = self.detector(gray, 0)
+            
+            for rect in rects:
+                x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
                 shape = self.predictor(gray, rect)
                 shape = face_utils.shape_to_np(shape)
-
-                # Eyetracking
+                
+                #Eyetacking
                 eye = self.final_ear(shape)
                 ear = eye[0]
                 leftEye = eye[1]
@@ -77,28 +74,26 @@ class DrowsinessDetectorApp:
                 rightEyeHull = cv2.convexHull(rightEye)
                 cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
                 cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
-
-                # Mouth
+                
+                	# Mouth
                 distance = self.lip_distance(shape)
                 lip = shape[48:60]
                 cv2.drawContours(frame, [lip], -1, (0, 255, 0), 1)
-
+                
                 if distance > self.YAWN_THRESH:
-                    cv2.putText(frame, "Yawn Alert", (10, 30),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                    #cv2.putText(frame, "Yawn Alert", (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                     if not self.alarm_status2 and not self.saying:
                         self.alarm_status2 = True
                         t = Thread(target=self.play_alarm, args=('alarm.wav',))
                         t.daemon = True
                         t.start()
                 else:
-                    self.alarm_status2 = False
-
+                   self.alarm_status2 = False
+				
                 if ear < self.EYE_AR_THRESH:
-                    self.COUNTER += 1
+                   self.COUNTER += 1
 
-                    if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES and not self.alarm_status:
-
+                   if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES and not self.alarm_status:
                         self.alarm_status = True
                         t = Thread(target=self.play_alarm, args=('alarm.wav',))
                         t.daemon = True
@@ -114,7 +109,8 @@ class DrowsinessDetectorApp:
             self.frame.imgtk = imgtk
             self.frame.config(image=imgtk)
 
-        self.frame.after(10, self.update_frame)
+            self.frame.after(10, self.update_frame)
+
 
     def final_ear(self, shape):
         (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
