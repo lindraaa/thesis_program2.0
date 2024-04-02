@@ -213,7 +213,7 @@ class App:
             # Close the current Python process
             sys.exit()
 
-
+#
     def add_new_webcam_for_registration(self, label):
         if 'cap' not in self.__dict__:
             self.cap = cv2.VideoCapture(0)
